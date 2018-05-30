@@ -1,0 +1,20 @@
+{
+  "name": "challengeruploaderapi",
+  "version": "1.0.0",
+  "description": "Challenger Uploader API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Developer",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "express-fileupload": "^0.4.0",
+    "fs": "0.0.1-security",
+    "jsonfile": "^4.0.0",
+    "method-override": "^2.3.10",
+    "uuid": "^3.2.1"
+  }
+}

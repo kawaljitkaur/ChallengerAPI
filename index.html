@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="css/challenger.css">
+	<title>Challenger Uploader</title>
+</head>
+
+<body onload="GetLatestVersion()">
+	<div class="header">
+		<h2>Challenger - Upload new version</h2>
+	</div>
+	<div class="body">
+		<h3 class="label">Latest Version -
+			<span id="latestVersion"></span>
+		</h3>
+		<form>
+			<div class="form-group">
+				<input type="text" name="version" id="version" class="form-control" placeholder="Enter Version" required>
+			</div>
+			<div class="form-group">
+				<input type="file" id="fileInput" required accept=".msi">
+			</div>
+			<div class="form-group">
+				<input type="button" class="btn-default" value="Submit" onclick="Upload()">
+			</div>
+			<span class="text-danger" id="errorMessage"></span>
+		</form>
+	</div>
+	<script src="js/jquery-2.1.3.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var latestVersion;
+
+		function GetLatestVersion() {
+			$.ajax({
+				cache: false,
+				async: true,
+				contentType: false,
+				processData: false,
+				type: "GET",
+				url: "http://localhost:3000/getLatest",
+				success: function (data) {
+					if (data.success) {
+						latestVersion = data.version;
+						$("#latestVersion").html(data.version);
+					}
+				},
+				error: function (xhr, status, err) {
+					$("#errorMessage").html("Server error");
+				}
+			});
+		}
+
+		function Upload() {
+			document.getElementById('errorMessage').innerHTML = "";
+			var files = document.getElementById("fileInput").files;
+			if (files.length < 1) {
+				$("#errorMessage").html("No file chosen");
+				return;
+			}
+			var file = files[0];
+			var extension = file.name.split('.').pop().toLowerCase();
+			if (extension != 'msi') {
+				$("#errorMessage").html("Invalid file input");
+				return;
+			}
+			var version = $("#version").val();
+			if (!version || version == '') {
+				$("#errorMessage").html("Version is required");
+				return;
+			}
+			var isFloat = (/[\d]+(\.[\d]+)?/).exec(version);
+			if (!isFloat[1]) {
+				$("#errorMessage").html("Invalid version");
+				return;
+			}
+			if (version <= latestVersion) {
+				$("#errorMessage").html("Version must be greater than latest version");
+				return;
+			}
+
+			var formData = new FormData();
+			formData.append("version", $("#version").val());
+			formData.append("uploadedFile", file);
+			var data = {
+				version: version,
+				uploadedFile: file
+			};
+			$.ajax({
+				cache: false,
+				async: true,
+				contentType: false,
+				processData: false,
+				type: "POST",
+				url: "http://localhost:3000/upload",
+				data: formData,
+				success: function (data) {
+					if (!data.success) {
+						$("#errorMessage").html(data.message);
+						return;
+					}
+					$("#errorMessage").removeClass("text-danger").addClass("text-success");
+					$("#errorMessage").addClass("text-success");
+					$("#errorMessage").html("Setup uploaded successfully");
+					setTimeout(function () {
+						location.reload();
+					}, 2000);
+				},
+				error: function (xhr, status, err) {
+					debugger;
+				}
+
+			});
+		}
+	</script>
+</body>
+
+</html>

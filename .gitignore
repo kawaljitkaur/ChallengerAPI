@@ -1,0 +1,9 @@
+.git
+dist
+*.zip
+.vs/
+data/
+uploads/
+node_modules/
+package-lock.json
+log.txt
